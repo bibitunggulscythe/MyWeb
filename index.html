@@ -44,6 +44,10 @@
     <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
     <script>
       eruda.init();
+      const navbarNav = document.querySelector(".navbar-nav");
+      document.querySelector(".hamburger").addEventListener("click", () => {
+      navbarNav.classList.toggle("active");
+      }
     </script>
   </body>
 </html>
