@@ -1,0 +1,107 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  outline: none;
+  border: none;
+  text-decoration: none;
+}
+
+body{
+  font-family: Arial, sans-serif;
+  background: #111;
+  color: white;
+  min-height: 2000px;
+}
+
+.hamburger {
+  width: 30px;
+  height: 25px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+}
+  
+.hamburger span {
+  height: 4px;
+  background-color: #fff;
+  border-radius: 2px;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  background: #333;
+  color: #fff;
+  align-items: center;
+  padding: 1rem 4%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+}
+
+.navbar a {
+  color: white;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.navbar a span {
+  color: #2ebce2fc;
+  font-weight: 750;
+}
+
+.navbar .navbar-nav a {
+  color: white;
+  display: inline-block;
+  font-size: 1.4rem;
+  margin: 0 1rem;
+}
+
+.navbar-extra {
+  display: none;
+}
+
+.hero .contains h1 {
+  margin: 6rem 5%;
+}
+
+@media (max-width: 1020px) {
+  html {
+  font-size: 80%;
+  }
+}
+
+@media (max-width: 680px) {
+  html {
+  font-size: 63%;
+  }
+  
+  .navbar .navbar-extra {
+    display: inline-block;
+  }
+  
+  .navbar .navbar-nav {
+  position: absolute;
+  background: #444;
+  top: 100%;
+  right: -100%;
+  width: 25rem;
+  height: 100vh;
+  transition: 0.3s;
+  }
+  
+  .navbar .navbar-nav a {
+    display: block;
+    margin: 1.5rem;
+    padding: 0.5rem;
+    font-size: 1.8rem;
+  }
+  
+  .navbar .navbar-nav.active {
+    right: 0;
+  }
+} 
