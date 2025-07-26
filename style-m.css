@@ -69,6 +69,10 @@ body{
   margin: 6rem 5%;
 }
 
+.hero .contains b {
+  font-size: 12px;
+}
+
 @media (max-width: 1020px) {
   html {
   font-size: 80%;
