@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arif — Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=Noto+Serif+JP:wght@300;400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   TOKENS & RESET
+═══════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --ink:       #0c0e16;
+  --ink2:      #131620;
+  --ink3:      #1a1e2e;
+  --panel:     #1e2236;
+  --border:    rgba(255,255,255,.07);
+  --border2:   rgba(255,255,255,.13);
+  --sakura:    #f472b6;
+  --sakura2:   #ec4899;
+  --sakura-glow: rgba(244,114,182,.25);
+  --gold:      #f5c97a;
+  --teal:      #5eead4;
+  --lavender:  #a78bfa;
+  --text:      #e8eaf2;
+  --muted:     #6b7491;
+  --muted2:    #9ba5c2;
+  --font:      'Zen Kaku Gothic New', sans-serif;
+  --serif:     'Noto Serif JP', serif;
+  --mono:      'Share Tech Mono', monospace;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--ink);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.7;
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* ── Custom cursor ── */
+.cursor {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--sakura);
+  position: fixed; top: 0; left: 0;
+  pointer-events: none; z-index: 9999;
+  transform: translate(-50%,-50%);
+  transition: transform .1s, width .2s, height .2s, opacity .2s;
+  mix-blend-mode: screen;
+}
+.cursor-ring {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 1px solid rgba(244,114,182,.5);
+  position: fixed; top: 0; left: 0;
+  pointer-events: none; z-index: 9998;
+  transform: translate(-50%,-50%);
+  transition: transform .15s ease, width .25s, height .25s;
+}
+@media(pointer:coarse) { .cursor, .cursor-ring { display:none; } body { cursor: auto; } }
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: var(--ink2); }
+::-webkit-scrollbar-thumb { background: var(--sakura2); border-radius: 2px; }
+
+/* ══════════════════════════════════════════
+   BACKGROUND EFFECTS
+══════════════════════════════════════════ */
+.bg-layer {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+}
+
+/* Grid lines */
+.bg-layer::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(244,114,182,.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(244,114,182,.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+/* Radial glow */
+.bg-layer::after {
+  content: '';
+  position: absolute;
+  width: 800px; height: 800px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(167,139,250,.06) 0%, transparent 70%);
+  top: -200px; right: -200px;
+}
+
+/* Floating sakura petals */
+.petals { position: fixed; inset: 0; pointer-events: none; z-index: 1; overflow: hidden; }
+.petal {
+  position: absolute; top: -20px;
+  width: 8px; height: 10px;
+  background: var(--sakura);
+  border-radius: 50% 0 50% 0;
+  opacity: 0;
+  animation: fall linear infinite;
+}
+.petal:nth-child(1)  { left:5%;   width:6px;  height:8px;  animation-duration:12s; animation-delay:0s;   opacity:.15; }
+.petal:nth-child(2)  { left:15%;  width:10px; height:12px; animation-duration:9s;  animation-delay:2s;   opacity:.1; }
+.petal:nth-child(3)  { left:25%;  width:7px;  height:9px;  animation-duration:14s; animation-delay:4s;   opacity:.12; }
+.petal:nth-child(4)  { left:40%;  width:5px;  height:7px;  animation-duration:11s; animation-delay:1s;   opacity:.08; }
+.petal:nth-child(5)  { left:55%;  width:9px;  height:11px; animation-duration:13s; animation-delay:6s;   opacity:.15; }
+.petal:nth-child(6)  { left:65%;  width:6px;  height:8px;  animation-duration:10s; animation-delay:3s;   opacity:.1; }
+.petal:nth-child(7)  { left:75%;  width:8px;  height:10px; animation-duration:15s; animation-delay:5s;   opacity:.12; }
+.petal:nth-child(8)  { left:88%;  width:7px;  height:9px;  animation-duration:11s; animation-delay:7s;   opacity:.09; }
+
+@keyframes fall {
+  0%   { transform: translateY(0)    rotate(0deg)   translateX(0); opacity: 0; }
+  10%  { opacity: .15; }
+  90%  { opacity: .1; }
+  100% { transform: translateY(100vh) rotate(720deg) translateX(60px); opacity: 0; }
+}
+
+/* ══════════════════════════════════════════
+   NAV
+══════════════════════════════════════════ */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+  padding: 0 24px;
+  background: rgba(12,14,22,.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; height: 56px;
+  gap: 6px;
+}
+
+.nav-logo {
+  font-family: var(--serif);
+  font-size: 18px; font-weight: 700;
+  color: var(--sakura);
+  letter-spacing: 2px;
+  margin-right: auto;
+  text-decoration: none;
+}
+.nav-logo span { color: var(--text); font-weight: 300; }
+
+.nav-links { display: flex; gap: 4px; }
+
+.nav-link {
+  font-family: var(--mono);
+  font-size: 11px; letter-spacing: 1px;
+  color: var(--muted2); text-decoration: none;
+  padding: 6px 12px; border-radius: 4px;
+  transition: color .2s, background .2s;
+  text-transform: uppercase;
+}
+.nav-link:hover { color: var(--sakura); background: rgba(244,114,182,.08); }
+
+.nav-mobile-btn {
+  display: none; background: none; border: none;
+  color: var(--muted2); font-size: 22px; cursor: pointer;
+}
+
+.nav-mobile-menu {
+  display: none; position: fixed;
+  top: 56px; left: 0; right: 0;
+  background: rgba(12,14,22,.97); backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 16px; flex-direction: column; gap: 4px; z-index: 499;
+}
+.nav-mobile-menu.open { display: flex; }
+.nav-mobile-menu .nav-link { font-size: 13px; padding: 12px 16px; }
+
+/* ══════════════════════════════════════════
+   MAIN WRAPPER
+══════════════════════════════════════════ */
+main { position: relative; z-index: 10; padding-top: 56px; }
+
+/* ══════════════════════════════════════════
+   SECTION COMMON
+══════════════════════════════════════════ */
+section { padding: 90px 24px; max-width: 960px; margin: 0 auto; }
+
+.section-eyebrow {
+  font-family: var(--mono); font-size: 11px; letter-spacing: 3px;
+  color: var(--sakura); text-transform: uppercase;
+  margin-bottom: 12px; display: flex; align-items: center; gap: 10px;
+}
+.section-eyebrow::after {
+  content: ''; flex: 1; max-width: 60px; height: 1px;
+  background: linear-gradient(90deg, var(--sakura), transparent);
+}
+
+.section-title {
+  font-family: var(--serif);
+  font-size: clamp(28px, 5vw, 42px);
+  font-weight: 700; line-height: 1.2;
+  letter-spacing: -0.5px;
+  margin-bottom: 16px;
+}
+
+.section-divider {
+  width: 48px; height: 2px; border-radius: 1px;
+  background: linear-gradient(90deg, var(--sakura), var(--lavender));
+  margin-bottom: 40px;
+}
+
+/* ══════════════════════════════════════════
+   HERO
+══════════════════════════════════════════ */
+#hero {
+  min-height: 100vh;
+  display: flex; align-items: center;
+  padding: 0 24px;
+  max-width: 960px; margin: 0 auto;
+  position: relative;
+}
+
+.hero-jp-text {
+  position: absolute;
+  right: 0; top: 50%;
+  transform: translateY(-50%);
+  writing-mode: vertical-rl;
+  font-family: var(--serif);
+  font-size: clamp(80px, 14vw, 140px);
+  font-weight: 900;
+  color: rgba(244,114,182,.04);
+  letter-spacing: 10px;
+  user-select: none;
+  line-height: 1;
+}
+
+.hero-content { position: relative; z-index: 2; }
+
+.hero-greeting {
+  font-family: var(--mono); font-size: 13px;
+  color: var(--sakura); letter-spacing: 3px;
+  margin-bottom: 16px;
+  animation: fadeUp .6s ease both;
+}
+
+.hero-name {
+  font-family: var(--serif);
+  font-size: clamp(44px, 9vw, 82px);
+  font-weight: 900; line-height: 1.0;
+  letter-spacing: -2px;
+  margin-bottom: 8px;
+  animation: fadeUp .6s .1s ease both;
+}
+
+.hero-name .highlight {
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--sakura);
+}
+
+.hero-role {
+  font-family: var(--mono); font-size: 15px;
+  color: var(--teal); letter-spacing: 2px;
+  margin-bottom: 24px;
+  animation: fadeUp .6s .2s ease both;
+}
+
+.hero-role::before { content: '[ '; color: var(--muted); }
+.hero-role::after  { content: ' ]'; color: var(--muted); }
+
+.hero-desc {
+  font-size: 16px; color: var(--muted2); line-height: 1.8;
+  max-width: 520px; margin-bottom: 36px;
+  animation: fadeUp .6s .3s ease both;
+}
+
+.hero-btns {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  animation: fadeUp .6s .4s ease both;
+}
+
+/* ── Decorative Japanese line ── */
+.hero-deco {
+  position: absolute; left: -24px; top: 0; bottom: 0;
+  width: 3px;
+  background: linear-gradient(to bottom, transparent, var(--sakura), var(--lavender), transparent);
+  opacity: .4;
+}
+
+/* ── Scroll indicator ── */
+.scroll-hint {
+  position: absolute; bottom: 32px; left: 24px;
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--mono); font-size: 10px;
+  color: var(--muted); letter-spacing: 2px;
+  animation: fadeUp .6s .8s ease both;
+}
+.scroll-arrow {
+  width: 1px; height: 40px;
+  background: linear-gradient(to bottom, var(--muted), transparent);
+  position: relative;
+}
+
+/* ══════════════════════════════════════════
+   BUTTONS
+══════════════════════════════════════════ */
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 12px 26px; border-radius: 3px;
+  font-family: var(--mono); font-size: 12px;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  cursor: pointer; text-decoration: none;
+  transition: all .2s; border: 1px solid;
+  font-weight: 500;
+}
+.btn:active { transform: scale(.97); }
+
+.btn-primary {
+  background: var(--sakura); border-color: var(--sakura);
+  color: var(--ink);
+  box-shadow: 0 0 20px var(--sakura-glow);
+}
+.btn-primary:hover {
+  background: transparent; color: var(--sakura);
+  box-shadow: 0 0 30px var(--sakura-glow);
+}
+
+.btn-outline {
+  background: transparent; border-color: var(--border2);
+  color: var(--muted2);
+}
+.btn-outline:hover { border-color: var(--sakura); color: var(--sakura); }
+
+/* ══════════════════════════════════════════
+   ABOUT
+══════════════════════════════════════════ */
+#about .about-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 48px;
+  align-items: start;
+}
+
+.about-avatar-wrap {
+  position: relative;
+}
+
+.about-avatar {
+  width: 100%; aspect-ratio: 1;
+  max-width: 300px;
+  background: var(--ink3);
+  border: 1px solid var(--border2);
+  border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 80px;
+  position: relative; overflow: hidden;
+}
+
+.about-avatar::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(244,114,182,.1), rgba(167,139,250,.1));
+}
+
+/* Corner decorations */
+.corner {
+  position: absolute; width: 20px; height: 20px;
+  border-color: var(--sakura); border-style: solid;
+}
+.corner-tl { top: 12px; left: 12px; border-width: 2px 0 0 2px; }
+.corner-tr { top: 12px; right: 12px; border-width: 2px 2px 0 0; }
+.corner-bl { bottom: 12px; left: 12px; border-width: 0 0 2px 2px; }
+.corner-br { bottom: 12px; right: 12px; border-width: 0 2px 2px 0; }
+
+.about-jp-tag {
+  position: absolute; bottom: -14px; right: -14px;
+  font-family: var(--serif); font-size: 11px;
+  color: var(--sakura); letter-spacing: 1px;
+  background: var(--ink2); border: 1px solid var(--border2);
+  padding: 6px 12px; border-radius: 2px;
+}
+
+.about-text p {
+  color: var(--muted2); margin-bottom: 16px; line-height: 1.9;
+}
+
+.about-tags {
+  display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px;
+}
+
+.tag {
+  font-family: var(--mono); font-size: 11px; letter-spacing: .5px;
+  padding: 4px 12px; border-radius: 2px;
+  border: 1px solid var(--border2); color: var(--muted2);
+  background: var(--ink3);
+  transition: border-color .2s, color .2s;
+}
+.tag:hover { border-color: var(--sakura); color: var(--sakura); }
+.tag.active { border-color: var(--sakura); color: var(--sakura); background: rgba(244,114,182,.08); }
+
+/* ══════════════════════════════════════════
+   SKILLS
+══════════════════════════════════════════ */
+#skills .skills-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+}
+
+.skill-card {
+  background: var(--ink2);
+  border: 1px solid var(--border);
+  border-radius: 4px; padding: 20px;
+  transition: border-color .2s, transform .2s, box-shadow .2s;
+  position: relative; overflow: hidden;
+}
+
+.skill-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--sakura), var(--lavender));
+  transform: scaleX(0); transform-origin: left;
+  transition: transform .3s ease;
+}
+.skill-card:hover::before { transform: scaleX(1); }
+.skill-card:hover {
+  border-color: rgba(244,114,182,.3);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(0,0,0,.3);
+}
+
+.skill-icon { font-size: 26px; margin-bottom: 10px; display: block; }
+.skill-name {
+  font-weight: 700; font-size: 14px; margin-bottom: 6px; color: var(--text);
+}
+.skill-desc {
+  font-family: var(--mono); font-size: 11px; color: var(--muted);
+  line-height: 1.6;
+}
+
+.skill-bar-wrap { margin-top: 12px; }
+.skill-bar-track {
+  height: 2px; background: var(--ink3); border-radius: 1px; overflow: hidden;
+}
+.skill-bar-fill {
+  height: 100%; border-radius: 1px;
+  background: linear-gradient(90deg, var(--sakura), var(--lavender));
+  width: 0; transition: width 1.2s cubic-bezier(.4,0,.2,1);
+}
+
+/* ══════════════════════════════════════════
+   PROJECTS
+══════════════════════════════════════════ */
+#projects .projects-list {
+  display: flex; flex-direction: column; gap: 20px;
+}
+
+.project-card {
+  background: var(--ink2);
+  border: 1px solid var(--border);
+  border-radius: 4px; padding: 28px 28px 22px;
+  display: grid; grid-template-columns: 1fr auto;
+  gap: 16px; align-items: start;
+  transition: border-color .2s, box-shadow .2s;
+  position: relative; overflow: hidden;
+}
+
+.project-card::after {
+  content: attr(data-num);
+  position: absolute; right: 20px; bottom: 14px;
+  font-family: var(--serif); font-size: 72px; font-weight: 900;
+  color: rgba(255,255,255,.02); line-height: 1;
+  pointer-events: none;
+}
+
+.project-card:hover {
+  border-color: rgba(244,114,182,.25);
+  box-shadow: 0 8px 30px rgba(0,0,0,.3), inset 0 0 40px rgba(244,114,182,.02);
+}
+
+.project-status {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 1px;
+  padding: 3px 10px; border-radius: 2px;
+  text-transform: uppercase; white-space: nowrap;
+}
+.status-done   { background: rgba(94,234,212,.12); color: var(--teal); border: 1px solid rgba(94,234,212,.3); }
+.status-wip    { background: rgba(245,201,122,.12); color: var(--gold); border: 1px solid rgba(245,201,122,.3); }
+.status-beta   { background: rgba(167,139,250,.12); color: var(--lavender); border: 1px solid rgba(167,139,250,.3); }
+
+.project-title {
+  font-family: var(--serif); font-size: 20px; font-weight: 700;
+  margin-bottom: 8px; color: var(--text);
+}
+
+.project-desc {
+  font-size: 14px; color: var(--muted2); line-height: 1.8;
+  margin-bottom: 16px;
+}
+
+.project-techs { display: flex; flex-wrap: wrap; gap: 6px; }
+.tech-pill {
+  font-family: var(--mono); font-size: 10px;
+  color: var(--muted); padding: 2px 9px; border-radius: 2px;
+  background: var(--ink3); border: 1px solid var(--border);
+}
+
+/* ══════════════════════════════════════════
+   CONTACT
+══════════════════════════════════════════ */
+#contact {
+  text-align: center;
+}
+
+#contact .section-eyebrow { justify-content: center; }
+#contact .section-eyebrow::after { display: none; }
+#contact .section-divider { margin: 0 auto 40px; }
+
+.contact-quote {
+  font-family: var(--serif); font-size: 18px;
+  color: var(--muted2); margin-bottom: 48px;
+  font-style: italic;
+  max-width: 520px; margin-left: auto; margin-right: auto;
+}
+.contact-quote::before { content: '「'; color: var(--sakura); }
+.contact-quote::after  { content: '」'; color: var(--sakura); }
+
+.social-grid {
+  display: flex; flex-wrap: wrap; justify-content: center;
+  gap: 14px; margin-bottom: 48px;
+}
+
+.social-link {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 22px; border-radius: 3px;
+  background: var(--ink2); border: 1px solid var(--border2);
+  color: var(--muted2); text-decoration: none;
+  font-family: var(--mono); font-size: 12px; letter-spacing: 1px;
+  transition: all .2s;
+}
+.social-link:hover {
+  border-color: var(--sakura); color: var(--sakura);
+  background: rgba(244,114,182,.06);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0,0,0,.2);
+}
+.social-icon { font-size: 18px; }
+
+.contact-email {
+  font-family: var(--mono); font-size: 14px; color: var(--muted2);
+  margin-bottom: 12px;
+}
+.contact-email a { color: var(--sakura); text-decoration: none; }
+.contact-email a:hover { text-decoration: underline; }
+
+/* ══════════════════════════════════════════
+   FOOTER
+══════════════════════════════════════════ */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 28px 24px;
+  text-align: center;
+  position: relative; z-index: 10;
+}
+.footer-text {
+  font-family: var(--mono); font-size: 11px;
+  color: var(--muted); letter-spacing: 1px;
+}
+.footer-jp {
+  font-family: var(--serif); font-size: 13px;
+  color: rgba(244,114,182,.3); margin-top: 4px;
+}
+
+/* ══════════════════════════════════════════
+   ANIMATIONS
+══════════════════════════════════════════ */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.reveal {
+  opacity: 0; transform: translateY(24px);
+  transition: opacity .7s ease, transform .7s ease;
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* ══════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════ */
+@media (max-width: 700px) {
+  section { padding: 64px 20px; }
+  #about .about-grid { grid-template-columns: 1fr; gap: 32px; }
+  .about-avatar { max-width: 220px; font-size: 56px; }
+  .skills-grid { grid-template-columns: 1fr 1fr !important; }
+  .project-card { grid-template-columns: 1fr; }
+  .hero-jp-text { display: none; }
+  .hero-deco { display: none; }
+  .nav-links { display: none; }
+  .nav-mobile-btn { display: block; }
+  .hero-btns .btn { width: 100%; justify-content: center; }
+}
+
+@media (max-width: 420px) {
+  .skills-grid { grid-template-columns: 1fr !important; }
+  .hero-name { font-size: 42px; letter-spacing: -1px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Cursor -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursor-ring"></div>
+
+<!-- Background -->
+<div class="bg-layer"></div>
+<div class="petals">
+  <div class="petal"></div><div class="petal"></div>
+  <div class="petal"></div><div class="petal"></div>
+  <div class="petal"></div><div class="petal"></div>
+  <div class="petal"></div><div class="petal"></div>
+</div>
+
+<!-- ══ NAV ══════════════════════════════════════ -->
+<nav>
+  <a href="#hero" class="nav-logo">A<span>rif</span></a>
+  <div class="nav-links">
+    <a href="#about"    class="nav-link">About</a>
+    <a href="#skills"   class="nav-link">Skills</a>
+    <a href="#projects" class="nav-link">Projects</a>
+    <a href="#contact"  class="nav-link">Contact</a>
+  </div>
+  <button class="nav-mobile-btn" onclick="toggleMenu()">☰</button>
+</nav>
+
+<div class="nav-mobile-menu" id="mobile-menu">
+  <a href="#about"    class="nav-link" onclick="toggleMenu()">About</a>
+  <a href="#skills"   class="nav-link" onclick="toggleMenu()">Skills</a>
+  <a href="#projects" class="nav-link" onclick="toggleMenu()">Projects</a>
+  <a href="#contact"  class="nav-link" onclick="toggleMenu()">Contact</a>
+</div>
+
+<main>
+
+<!-- ══ HERO ══════════════════════════════════════ -->
+<section id="hero">
+  <div class="hero-deco"></div>
+  <div class="hero-jp-text">開発者</div>
+
+  <div class="hero-content">
+    <div class="hero-greeting">// こんにちは — Halo, perkenalkan</div>
+    <h1 class="hero-name">
+      Aku <span class="highlight">Arif</span>
+    </h1>
+    <div class="hero-role">Python Developer &amp; Reverse Engineer</div>
+    <p class="hero-desc">
+      Independent developer yang passionate di binary reverse engineering,
+      visual novel modding, dan membangun tools Python dari Android.
+      Berkarya dari Termux, satu baris kode dalam satu waktu.
+    </p>
+    <div class="hero-btns">
+      <a href="#projects" class="btn btn-primary">Lihat Project →</a>
+      <a href="#contact"  class="btn btn-outline">Hubungi Aku</a>
+    </div>
+  </div>
+
+  <div class="scroll-hint">
+    <div class="scroll-arrow"></div>
+    scroll
+  </div>
+</section>
+
+<!-- ══ ABOUT ══════════════════════════════════════ -->
+<section id="about">
+  <div class="section-eyebrow">About Me</div>
+  <h2 class="section-title reveal">Tentang Aku</h2>
+  <div class="section-divider"></div>
+
+  <div class="about-grid">
+    <div class="about-avatar-wrap reveal">
+      <div class="about-avatar">
+        🧑‍💻
+        <div class="corner corner-tl"></div>
+        <div class="corner corner-tr"></div>
+        <div class="corner corner-bl"></div>
+        <div class="corner corner-br"></div>
+      </div>
+      <div class="about-jp-tag">開発者 · Developer</div>
+    </div>
+
+    <div class="about-text reveal">
+      <p>
+        Halo! Aku <strong style="color:var(--sakura)">Arif</strong>, seorang independent developer
+        berbasis di Indonesia yang fokus di Python development dan binary reverse engineering.
+        Semua kerjaan aku lakukan dari <strong style="color:var(--teal)">Android + Termux</strong> — tanpa PC.
+      </p>
+      <p>
+        Ketertarikan utamaku ada di visual novel games — terutama menganalisis dan
+        memodifikasi engine-engine seperti KiriKiri2 dan BGI. Dari sana aku belajar
+        banyak tentang enkripsi, binary format, dan low-level programming.
+      </p>
+      <p>
+        Saat ini sedang mendalami <em style="color:var(--lavender)">CS:APP</em> dan Capstone disassembly framework
+        sambil terus membangun tools RE untuk komunitas VN Indonesia.
+      </p>
+      <div class="about-tags">
+        <span class="tag active">Python</span>
+        <span class="tag active">Reverse Engineering</span>
+        <span class="tag">Termux / ARM64</span>
+        <span class="tag">KiriKiri2</span>
+        <span class="tag">BGI Engine</span>
+        <span class="tag">Visual Novel</span>
+        <span class="tag">Binary Analysis</span>
+        <span class="tag">Indonesia</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SKILLS ══════════════════════════════════════ -->
+<section id="skills">
+  <div class="section-eyebrow">Skills</div>
+  <h2 class="section-title reveal">Skill &amp; Teknologi</h2>
+  <div class="section-divider"></div>
+
+  <div class="skills-grid">
+
+    <div class="skill-card reveal">
+      <span class="skill-icon">🐍</span>
+      <div class="skill-name">Python</div>
+      <div class="skill-desc">scripting · file parsing · CLI tools · OOP</div>
+      <div class="skill-bar-wrap">
+        <div class="skill-bar-track"><div class="skill-bar-fill" data-width="78"></div></div>
+      </div>
+    </div>
+
+    <div class="skill-card reveal">
+      <span class="skill-icon">🔍</span>
+      <div class="skill-name">Reverse Engineering</div>
+      <div class="skill-desc">binary analysis · XOR · encryption · format research</div>
+      <div class="skill-bar-wrap">
+        <div class="skill-bar-track"><div class="skill-bar-fill" data-width="72"></div></div>
+      </div>
+    </div>
+
+    <div class="skill-card reveal">
+      <span class="skill-icon">🗂️</span>
+      <div class="skill-name">Binary Formats</div>
+      <div class="skill-desc">PSB · XP3 · KiriKiri2 · BGI · RPG Maker</div>
+      <div class="skill-bar-wrap">
+        <div class="skill-bar-track"><div class="skill-bar-fill" data-width="80"></div></div>
+      </div>
+    </div>
+
+    <div class="skill-card reveal">
+      <span class="skill-icon">📱</span>
+      <div class="skill-name">Termux / Android</div>
+      <div class="skill-desc">ARM64 · CLI dev · mobile-first workflow</div>
+      <div class="skill-bar-wrap">
+        <div class="skill-bar-track"><div class="skill-bar-fill" data-width="85"></div></div>
+      </div>
+    </div>
+
+    <div class="skill-card reveal">
+      <span class="skill-icon">⚙️</span>
+      <div class="skill-name">Capstone / ASM</div>
+      <div class="skill-desc">disassembly · x86 · ARM · control flow</div>
+      <div class="skill-bar-wrap">
+        <div class="skill-bar-track"><div class="skill-bar-fill" data-width="55"></div></div>
+      </div>
+    </div>
+
+    <div class="skill-card reveal">
+      <span class="skill-icon">🌐</span>
+      <div class="skill-name">Web Tools</div>
+      <div class="skill-desc">Flask · Bottle · HTML/CSS · REST API</div>
+      <div class="skill-bar-wrap">
+        <div class="skill-bar-track"><div class="skill-bar-fill" data-width="60"></div></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══ PROJECTS ══════════════════════════════════════ -->
+<section id="projects">
+  <div class="section-eyebrow">Projects</div>
+  <h2 class="section-title reveal">Project yang Pernah Dibuat</h2>
+  <div class="section-divider"></div>
+
+  <div class="projects-list">
+
+    <div class="project-card reveal" data-num="01">
+      <div>
+        <div class="project-title">Dacapek Archive Extractor</div>
+        <p class="project-desc">
+          Tool Python untuk mendekripsi dan mengekstrak 695 file PSB dari archive
+          custom KiriKiri2 "dacapek". Berhasil reverse-engineer skema enkripsi 3 lapis
+          (XOR + Byte Shuffle + rXOR) dengan key derivasi FNV-1a + LCG dari passphrase.
+        </p>
+        <div class="project-techs">
+          <span class="tech-pill">Python</span>
+          <span class="tech-pill">KiriKiri2</span>
+          <span class="tech-pill">XOR Crypto</span>
+          <span class="tech-pill">FNV-1a</span>
+          <span class="tech-pill">Binary RE</span>
+        </div>
+      </div>
+      <span class="project-status status-done">Selesai</span>
+    </div>
+
+    <div class="project-card reveal" data-num="02">
+      <div>
+        <div class="project-title">VN ToolKit — Web UI</div>
+        <p class="project-desc">
+          Aplikasi web berbasis Bottle Python dengan UI dark anime aesthetic
+          untuk menjalankan tools reverse engineering VN langsung dari browser HP.
+          Fitur: PSB parser, XOR analyzer, archive extractor dengan progress bar real-time.
+        </p>
+        <div class="project-techs">
+          <span class="tech-pill">Python</span>
+          <span class="tech-pill">Bottle</span>
+          <span class="tech-pill">HTML/CSS/JS</span>
+          <span class="tech-pill">REST API</span>
+          <span class="tech-pill">Termux</span>
+        </div>
+      </div>
+      <span class="project-status status-wip">In Progress</span>
+    </div>
+
+    <div class="project-card reveal" data-num="03">
+      <div>
+        <div class="project-title">Anime Tracker CLI</div>
+        <p class="project-desc">
+          Aplikasi CLI Python dengan SQLite3 untuk tracking anime. Dilengkapi
+          struktur package modular (\_\_main\_\_.py + database.py), ANSI coloring,
+          dan input validation helper yang reusable.
+        </p>
+        <div class="project-techs">
+          <span class="tech-pill">Python</span>
+          <span class="tech-pill">SQLite3</span>
+          <span class="tech-pill">CLI</span>
+          <span class="tech-pill">ANSI</span>
+          <span class="tech-pill">Termux</span>
+        </div>
+      </div>
+      <span class="project-status status-wip">In Progress</span>
+    </div>
+
+    <div class="project-card reveal" data-num="04">
+      <div>
+        <div class="project-title">RPG Maker MV Translator</div>
+        <p class="project-desc">
+          Script Python untuk menerjemahkan game RPG Maker MV Jepang ke Bahasa Indonesia.
+          Meliputi JSON data extraction, text injection, dan plugin string replacement
+          di plugins.js untuk menu dan UI game.
+        </p>
+        <div class="project-techs">
+          <span class="tech-pill">Python</span>
+          <span class="tech-pill">JSON</span>
+          <span class="tech-pill">RPG Maker MV</span>
+          <span class="tech-pill">Localization</span>
+        </div>
+      </div>
+      <span class="project-status status-done">Selesai</span>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══ CONTACT ══════════════════════════════════════ -->
+<section id="contact">
+  <div class="section-eyebrow">Contact</div>
+  <h2 class="section-title reveal">Mari Terhubung</h2>
+  <div class="section-divider"></div>
+
+  <p class="contact-quote reveal">
+    Terbuka untuk kolaborasi, proyek freelance, atau sekadar ngobrol soal VN dan RE
+  </p>
+
+  <div class="social-grid reveal">
+    <a href="#" class="social-link">
+      <span class="social-icon">🐙</span> GitHub
+    </a>
+    <a href="#" class="social-link">
+      <span class="social-icon">💬</span> Telegram
+    </a>
+    <a href="#" class="social-link">
+      <span class="social-icon">🐦</span> Twitter / X
+    </a>
+    <a href="#" class="social-link">
+      <span class="social-icon">💼</span> LinkedIn
+    </a>
+  </div>
+
+  <div class="contact-email reveal">
+    atau email langsung ke →
+    <a href="mailto:arif@example.com">arif@example.com</a>
+  </div>
+</section>
+
+</main>
+
+<!-- ══ FOOTER ══════════════════════════════════════ -->
+<footer>
+  <div class="footer-text">© 2025 Arif · Built with HTML + CSS + ❤️ from Termux</div>
+  <div class="footer-jp">あなたのストーリーはまだ続く</div>
+</footer>
+
+<script>
+/* ── Custom cursor ─────────────────────────────── */
+const cur  = document.getElementById('cursor');
+const curR = document.getElementById('cursor-ring');
+let mx = 0, my = 0, rx = 0, ry = 0;
+document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+function animCursor() {
+  rx += (mx - rx) * .15;
+  ry += (my - ry) * .15;
+  if (cur)  cur.style.transform  = `translate(${mx}px,${my}px) translate(-50%,-50%)`;
+  if (curR) curR.style.transform = `translate(${rx}px,${ry}px) translate(-50%,-50%)`;
+  requestAnimationFrame(animCursor);
+}
+animCursor();
+
+document.querySelectorAll('a,button,.skill-card,.project-card').forEach(el => {
+  el.addEventListener('mouseenter', () => {
+    cur?.style.setProperty('width','14px');
+    cur?.style.setProperty('height','14px');
+    curR?.style.setProperty('width','48px');
+    curR?.style.setProperty('height','48px');
+  });
+  el.addEventListener('mouseleave', () => {
+    cur?.style.setProperty('width','8px');
+    cur?.style.setProperty('height','8px');
+    curR?.style.setProperty('width','32px');
+    curR?.style.setProperty('height','32px');
+  });
+});
+
+/* ── Mobile nav ────────────────────────────────── */
+function toggleMenu() {
+  document.getElementById('mobile-menu').classList.toggle('open');
+}
+
+/* ── Scroll reveal ─────────────────────────────── */
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      // Skill bars
+      e.target.querySelectorAll('.skill-bar-fill').forEach(bar => {
+        bar.style.width = bar.dataset.width + '%';
+      });
+    }
+  });
+}, { threshold: .12 });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// Also observe skill cards for bars
+document.querySelectorAll('.skill-card').forEach(card => {
+  const bar = card.querySelector('.skill-bar-fill');
+  if (!bar) return;
+  const obs = new IntersectionObserver(entries => {
+    if (entries[0].isIntersecting) {
+      bar.style.width = bar.dataset.width + '%';
+      obs.disconnect();
+    }
+  }, { threshold: .3 });
+  obs.observe(card);
+});
+
+/* ── Active nav link on scroll ─────────────────── */
+const sections = document.querySelectorAll('section[id]');
+const navLinks  = document.querySelectorAll('.nav-link');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => {
+    if (window.scrollY >= s.offsetTop - 80) current = s.id;
+  });
+  navLinks.forEach(l => {
+    l.style.color = l.getAttribute('href') === '#' + current
+      ? 'var(--sakura)' : '';
+  });
+}, { passive: true });
+</script>
+</body>
+</html>
